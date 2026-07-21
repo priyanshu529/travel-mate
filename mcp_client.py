@@ -15,7 +15,7 @@ client=MultiServerMCPClient(
         },   
          "travelpayouts-custom": {
             "command": "python",
-            "args": [r"C:\\Users\\Priyanshu2006\\Desktop\\travel agent\\mcp_server.py"],
+            "args": ["mcp_server.py"],
             "transport": "stdio"
         }
                 }
