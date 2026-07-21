@@ -12,7 +12,7 @@ from langchain_core.messages import (
 from pydantic import BaseModel, Field
 from langchain_groq import ChatGroq
 from datetime import date
-from tools.flight_tool import search_flights
+# from tools.flight_tool import search_flights
 from mcp_client import tavily_mcp_search,flight_mcp_search
 DATABASE_URL=os.getenv("DATABASE_URL")
 import asyncio
