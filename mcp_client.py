@@ -15,7 +15,7 @@ client=MultiServerMCPClient(
         },   
          "travelpayouts-custom": {
             "command": "python",
-            "args": [r"C:\Users\Priyanshu2006\Desktop\travel agent\travelpayouts_mcp_server.py"],
+            "args": [r"C:\\Users\\Priyanshu2006\\Desktop\\travel agent\\mcp_server.py"],
             "transport": "stdio"
         }
                 }
@@ -65,12 +65,23 @@ async def initialize_mcp():
 
 async def tavily_mcp_search(query:str):
     await initialize_mcp()
-    result=await search_tool.ainvoke(
+    response=await search_tool.ainvoke(
         {
-            "query":query
-        }
+            "query":query,"max_results":5
+        }       
     )
-    return result
+    result=[]
+    for i, r in enumerate(response, start=1):
+        title=r.get("title","unknown")
+        url=r.get("url","")
+        snippet=r.get("content","")
+    
+        if len(snippet)>300:
+            snippet=snippet[:300].rsplit(" ",1)[0]+ "...."
+    
+        result.append( f"{i}. **{title}** \n {url} \n  {snippet}")
+    
+    return "\n\n".join(result)
 
 
 async def flight_mcp_search(destination, depart_date, ret_date=None, origin="DEL", passengers=1,currency="INR"):

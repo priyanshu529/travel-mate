@@ -16,6 +16,13 @@ from tools.flight_tool import search_flights
 from mcp_client import tavily_mcp_search,flight_mcp_search
 DATABASE_URL=os.getenv("DATABASE_URL")
 import asyncio
+import streamlit as st
+
+
+DATABASE_URL = st.secrets["DATABASE_URL"]
+GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+TAVILY_API_KEY = st.secrets["TAVILY_API_KEY"]
+
 
 llm=ChatGroq(
     model="openai/gpt-oss-120b"
@@ -65,6 +72,7 @@ Rules:
 
     result = structured_llm.invoke(prompt)
     flight_data=asyncio.run(flight_mcp_search(result.arrival_iata,result.departure_date,result.return_date,result.departure_iata,result.passengers))
+
     return {
         "flight_result":flight_data,
         "messages":[
@@ -76,7 +84,6 @@ Rules:
 def hotel_agent(state:TravelState):
     query=f"best hotels for {state["user_query"]}"
     hotel_results=asyncio.run(tavily_mcp_search(query))
-
     return {
         "hotel_results":hotel_results,
         "messages":[
@@ -116,7 +123,7 @@ Your task is to combine the flight results, hotel recommendations, and itinerary
 
 Requirements:
 - Use Markdown.
-- Keep the response under 5000 words.
+- Keep the response under 2000 words.
 - Do NOT explain your reasoning.
 - Do NOT repeat information.
 - Be concise and practical.
@@ -173,12 +180,22 @@ Itinerary:
 
     response = llm.invoke([
         HumanMessage(content=final_prompt)
-    ])
+    ],max_tokens=1500)
 
     return {
         "messages": [response],
         "llm_calls": state.get("llm_calls", 0) + 1
     }
+
+
+def summary_llm(result):
+    prompt=f"""
+summarize the following result of the agent:{result} 
+keeping all the necesary details (eg if its flight agent keep the flight name,id,price,timing etc) 
+and remove all the unnecessary and boilerplate statements.
+"""
+    response=llm.invoke(prompt)
+    return response.content
 # build graph
 
 graph=StateGraph(TravelState)
