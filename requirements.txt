@@ -17,7 +17,7 @@ python-dotenv
 serpapi
 pydantic
 FastMCP
-langchain-mcp-adapter
+langchain-mcp-adapters
 typing
 asyncio
 streamlit
