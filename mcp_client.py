@@ -4,8 +4,8 @@ import os
 import asyncio
 load_dotenv()
 
-TAVILY_API_KEY=os.getenv("TAVILY_API_KEY")
-SERPAPI_KEY=os.getenv("SERPAPI_KEY")
+TAVILY_API_KEY = st.secrets["TAVILY_API_KEY"]
+SERPAPI_KEY=st.secrets["SERPAPI_KEY"]
 
 client=MultiServerMCPClient(
     {
