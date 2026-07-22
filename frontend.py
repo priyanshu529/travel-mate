@@ -330,7 +330,7 @@ if generate:
                 {
                     "messages": [HumanMessage(content=user_query)],
                     "user_query": user_query,
-                    "flight_results": "",
+                    "flight_result": "",
                     "hotel_results": "",
                     "itinerary": "",
                     "llm_calls": 0,
@@ -340,7 +340,7 @@ if generate:
             ):
                 for node_name, state_update in chunk.items():
                     if node_name == "flight_agent":
-                        collected["flight_results"] = state_update.get("flight_results", "")
+                        collected["flight_result"] = state_update.get("flight_result", "")
                     elif node_name == "hotel_agent":
                         collected["hotel_results"] = state_update.get("hotel_results", "")
                     elif node_name == "itinerary_agent":
@@ -375,7 +375,7 @@ if generate:
 ---
 
 ## ✈️ Flight Information
-{collected['flight_results'] or 'N/A'}
+{collected['flight_result'] or 'N/A'}
 
 ---
 
