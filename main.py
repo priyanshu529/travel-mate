@@ -58,16 +58,17 @@ class FlightQuery(BaseModel):
 def flight_agent(state:TravelState):
     structured_llm = llm.with_structured_output(FlightQuery)
     query=state["user_query"]
-    prompt = f"""Extract flight search parameters from this user query: "{query}"
+    prompt = f"""Extract flight search parameters from this user query: {query}
 
 Rules:
-- Today's date is {date.today().isoformat()}.
+- Todays date is {date.today().isoformat()}.
 - If the departure airport is not mentioned, assume DEFAULT_ORIGIN (Delhi).
 - If the destination city is mentioned but not a specific airport, pick the primary
   international airport for that city (e.g. Tokyo -> NRT).
 - If "today" or a relative date is mentioned, resolve it to an actual YYYY-MM-DD date
   using today's date above.
 - Never ask a clarifying question — always return your best-guess values for every field.
+-If departure date and number of days of trip is given,calculate return date.
 """
 
     result = structured_llm.invoke(prompt)
@@ -97,7 +98,7 @@ def itinerary_agent(state:TravelState):
     prompt=f"""
     create a travel itinerary based on the following data.
     User Query:{state['user_query']},
-    Flight Results:{state["flight_result"]},
+    Flight Results(round trip):{state["flight_result"]},
     Hotel Results:{state["hotel_results"]}
 """
     response=llm.invoke([SystemMessage(
@@ -138,6 +139,7 @@ Format exactly like this:
 
 # ✈️ Flights
 note:flights prices should be based on number of people from the query,if not provided assume the paasengers to be 1.
+note:the flight details provided are of a round trip as depature date and return date are provided
 - Airline
 - Route
 - Departure
