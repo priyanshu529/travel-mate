@@ -90,25 +90,6 @@ html, body, .stApp {
     margin-bottom: 0.5rem;
 }
 
-/* ── Quick destinations ── */
-.dest-row {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin: 0.8rem 0 1.2rem;
-}
-.dest-chip {
-    background: #111b2b;
-    border: 1px solid #1e3050;
-    color: #f7fdf4;
-    padding: 0.35rem 0.85rem;
-    border-radius: 20px;
-    font-size: 0.82rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.dest-chip:hover { background: #1a2e47; border-color: #3a7bd5; color: #fff; }
-
 /* ── Generate button ── */
 div[data-testid="stButton"] > button {
     background: linear-gradient(135deg, #1a6bbf 0%, #0d4a8a 50%, #0a3d75 100%) !important;
@@ -142,23 +123,6 @@ div[data-testid="stButton"] > button:active {
     border-bottom: 1px solid #1e2e44;
 }
 .sec-head span { font-size: 1.15rem; font-weight: 600; color: #e0edf8; }
-
-/* ── Metric bar ── */
-.metric-row {
-    display: flex;
-    gap: 1rem;
-    margin: 1.5rem 0;
-}
-.metric-box {
-    flex: 1;
-    background: #0e1623;
-    border: 1px solid #1e2e44;
-    border-radius: 12px;
-    padding: 1rem 1.2rem;
-    text-align: center;
-}
-.metric-val { font-size: 1.8rem; font-weight: 700; color: #4ea8f0; }
-.metric-lbl { font-size: 0.78rem; color: #5a7a96; margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.08em; }
 
 /* ── Final plan ── */
 .final-card {
@@ -212,9 +176,8 @@ input[type="text"]:focus, .stTextInput input:focus {
     border-color: #3a7bd5 !important;
     box-shadow: 0 0 0 2px rgba(58,123,213,0.2) !important;
 }
-input[type="text"]::placeholder { color: #3a5570 !important; }
 
-/* All Streamlit labels — dark bg → light text */
+/* Labels */
 .stTextInput label, .stTextArea label,
 .stSelectbox label, .stNumberInput label {
     color: #7ab8f5 !important;
@@ -223,7 +186,7 @@ input[type="text"]::placeholder { color: #3a5570 !important; }
     letter-spacing: 0.08em !important;
 }
 
-/* General markdown / paragraph text */
+/* Markdown */
 .stMarkdown p, .stMarkdown li, .stMarkdown td, .stMarkdown th {
     color: #cce0f5 !important;
 }
@@ -235,18 +198,9 @@ input[type="text"]::placeholder { color: #3a5570 !important; }
     border-radius: 4px;
 }
 
-/* Metric labels */
-.metric-lbl { color: #7aa8cc !important; }
-
-/* Save bar */
-.save-bar { color: #8ab8d8 !important; }
-.save-bar code { color: #7ab8f5 !important; background: #0a1520 !important; }
-
-/* Streamlit warning / info / success on dark bg */
 .stAlert { background: #0e1a2b !important; border-radius: 10px !important; }
 .stAlert p, .stAlert div { color: #e0edf8 !important; }
 
-/* Download button — light bg → dark text  */
 div[data-testid="stDownloadButton"] > button {
     background: #1a3a5c !important;
     color: #e8f4ff !important;
@@ -256,7 +210,7 @@ div[data-testid="stDownloadButton"] > button {
 </style>
 """, unsafe_allow_html=True)
 
-# ── Fixed session id (no sidebar / user input for it anymore) ────────────────
+# ── Session ID ────────────────────────────────────────────────────────────────
 thread_id = "aarohi_user"
 
 # ── Hero ──────────────────────────────────────────────────────────────────────
@@ -273,13 +227,13 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ── Destination image strip ───────────────────────────────────────────────────
+# ── Destination strip ─────────────────────────────────────────────────────────
 DESTINATIONS = [
-    ("🇯🇵 Tokyo",     "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=300&q=70"),
-    ("🇫🇷 Paris",     "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=300&q=70"),
-    ("🇹🇭 Bangkok",   "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=300&q=70"),
-    ("🇮🇹 Rome",      "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=300&q=70"),
-    ("🇦🇪 Dubai",     "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=300&q=70"),
+    ("🇯🇵 Tokyo",   "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=300&q=70"),
+    ("🇫🇷 Paris",   "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=300&q=70"),
+    ("🇹🇭 Bangkok", "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=300&q=70"),
+    ("🇮🇹 Rome",    "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=300&q=70"),
+    ("🇦🇪 Dubai",   "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=300&q=70"),
 ]
 
 cols = st.columns(5)
@@ -316,14 +270,21 @@ user_query = st.text_area(
 
 generate = st.button("🚀  Generate My Travel Plan", use_container_width=True)
 
-# ── Run pipeline (silently) and show only the final output ──────────────────
+# ── Pipeline ──────────────────────────────────────────────────────────────────
 if generate:
     if not user_query.strip():
         st.warning("Please describe your trip first.")
     else:
         config = {"configurable": {"thread_id": thread_id}}
-        collected = {"flight_results": "", "hotel_results": "",
-                     "itinerary": "", "final_response": "", "llm_calls": 0}
+
+        # ── FIXED: consistent key name "flight_result" throughout ──
+        collected = {
+            "flight_result": "",   # ← was "flight_results" (plural) before — now fixed
+            "hotel_results": "",
+            "itinerary": "",
+            "final_response": "",
+            "llm_calls": 0,
+        }
 
         with st.spinner("🤖 Planning your trip..."):
             for chunk in app.stream(
@@ -349,19 +310,34 @@ if generate:
                         msgs = state_update.get("messages", [])
                         collected["final_response"] = msgs[-1].content if msgs else ""
 
-                    collected["llm_calls"] = state_update.get("llm_calls", collected["llm_calls"])
+                    collected["llm_calls"] = state_update.get(
+                        "llm_calls", collected["llm_calls"]
+                    )
 
-        # Final plan card
+        # ── Debug expander: inspect raw tool outputs ──────────────────────────
+        with st.expander("🔍 Debug: Raw agent outputs", expanded=False):
+            st.markdown("**✈️ Raw flight_result:**")
+            st.code(collected["flight_result"] or "(empty)", language="text")
+            st.markdown("**🏨 Raw hotel_results:**")
+            st.code(collected["hotel_results"] or "(empty)", language="text")
+            st.markdown("**🗓️ Raw itinerary:**")
+            st.code(collected["itinerary"] or "(empty)", language="text")
+
+        # ── Final plan ────────────────────────────────────────────────────────
         st.markdown("---")
         if collected["final_response"]:
-            st.markdown("<div class='sec-head'><span>🧠 Your Travel Plan</span></div>",
-                        unsafe_allow_html=True)
-            st.markdown(f"<div class='final-card'>{collected['final_response']}</div>",
-                        unsafe_allow_html=True)
+            st.markdown(
+                "<div class='sec-head'><span>🧠 Your Travel Plan</span></div>",
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f"<div class='final-card'>{collected['final_response']}</div>",
+                unsafe_allow_html=True,
+            )
         else:
             st.warning("No travel plan was generated. Please try again.")
 
-        # Save
+        # ── Save & download ───────────────────────────────────────────────────
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"travel_plan_{timestamp}.md"
         save_dir = os.path.join(os.path.dirname(__file__), "travel_plans")
@@ -400,9 +376,15 @@ if generate:
 
         dl_col, info_col = st.columns([1, 3])
         with dl_col:
-            st.download_button("⬇️ Download Plan", data=file_content,
-                               file_name=filename, mime="text/markdown",
-                               use_container_width=True)
+            st.download_button(
+                "⬇️ Download Plan",
+                data=file_content,
+                file_name=filename,
+                mime="text/markdown",
+                use_container_width=True,
+            )
         with info_col:
-            st.markdown(f"<div class='save-bar'>📁 Auto-saved → <code>travel_plans/{filename}</code></div>",
-                        unsafe_allow_html=True)
+            st.markdown(
+                f"<div class='save-bar'>📁 Auto-saved → <code>travel_plans/{filename}</code></div>",
+                unsafe_allow_html=True,
+            )
