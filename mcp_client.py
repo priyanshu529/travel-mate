@@ -2,24 +2,22 @@ from dotenv import load_dotenv
 from langchain_mcp_adapters.client import MultiServerMCPClient
 import os
 import asyncio
-import streamlit as st
 load_dotenv()
 
-TAVILY_API_KEY = st.secrets["TAVILY_API_KEY"]
-SERPAPI_KEY=st.secrets["SERPAPI_API_KEY"]
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
+SERPAPI_KEY = os.getenv("SERPAPI_KEY")
 
-client=MultiServerMCPClient(
+client = MultiServerMCPClient(
     {
-        "tavily":{
-            "transport":"streamable_http",
-            "url":f"https://mcp.tavily.com/mcp/?tavilyApiKey={TAVILY_API_KEY}"
-        },   
-         "travelpayouts-custom": {
-            "command": "python",
-            "args": ["mcp_server.py"],
-            "transport": "stdio"
+        "tavily": {
+            "transport": "streamable_http",
+            "url": f"https://mcp.tavily.com/mcp/?tavilyApiKey={TAVILY_API_KEY}"
+        },
+        "travelpayouts-custom": {
+            "transport": "streamable_http",
+            "url": "https://surrounding-apricot-goldfish.fastmcp.app/mcp"
         }
-                }
+    }
 )
 
 
@@ -33,8 +31,8 @@ client=MultiServerMCPClient(
 #     asyncio.run(main())
 
 
-search_tool=None
-flight_tools={}
+search_tool = None
+flight_tools = {}
 
 async def initialize_mcp():
     global search_tool
@@ -42,50 +40,50 @@ async def initialize_mcp():
     if search_tool is not None:
         return
 
-    tools=await client.get_tools()
-    
-    search_tool=next((tool for tool in tools if tool.name=="tavily_search"),None)
-    
+    tools = await client.get_tools()
+
+    search_tool = next((tool for tool in tools if tool.name == "tavily_search"), None)
+
     if search_tool is None:
         raise RuntimeError(
             "MCP tool tavily search is not found among available tools:"
         )
-    
+
     required_flight_tools = ["search_flights_prices"]
 
-    flight_tools={
-            tool.name:tool
-            for tool in tools
-            if tool.name in required_flight_tools
-        }
-    if len(flight_tools)<len(required_flight_tools):
+    flight_tools = {
+        tool.name: tool
+        for tool in tools
+        if tool.name in required_flight_tools
+    }
+    if len(flight_tools) < len(required_flight_tools):
         raise RuntimeError(
             f""""only {len(flight_tools)} flight_tools are loaded:\n"""
-             f"Found: {list(flight_tools.keys())}"
+            f"Found: {list(flight_tools.keys())}"
         )
 
-async def tavily_mcp_search(query:str):
+async def tavily_mcp_search(query: str):
     await initialize_mcp()
-    response=await search_tool.ainvoke(
+    response = await search_tool.ainvoke(
         {
-            "query":query,"max_results":5
-        }       
+            "query": query, "max_results": 5
+        }
     )
-    result=[]
+    result = []
     for i, r in enumerate(response, start=1):
-        title=r.get("title","unknown")
-        url=r.get("url","")
-        snippet=r.get("content","")
-    
-        if len(snippet)>300:
-            snippet=snippet[:300].rsplit(" ",1)[0]+ "...."
-    
-        result.append( f"{i}. **{title}** \n {url} \n  {snippet}")
-    
+        title = r.get("title", "unknown")
+        url = r.get("url", "")
+        snippet = r.get("content", "")
+
+        if len(snippet) > 300:
+            snippet = snippet[:300].rsplit(" ", 1)[0] + "...."
+
+        result.append(f"{i}. **{title}** \n {url} \n  {snippet}")
+
     return "\n\n".join(result)
 
 
-async def flight_mcp_search(destination, depart_date, ret_date=None, origin="DEL", passengers=1,currency="INR"):
+async def flight_mcp_search(destination, depart_date, ret_date=None, origin="DEL", passengers=1, currency="INR"):
 
     await initialize_mcp()  # make sure flight_tools is populated first
 
