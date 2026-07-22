@@ -59,7 +59,7 @@ async def tavily_mcp_search(query: str):
     response = await search_tool.ainvoke(
         {
             "query": query, "max_results": 10,
-            include_domains = [
+            include_domains: [
             "booking.com",
             "agoda.com",
             "tripadvisor.com",
