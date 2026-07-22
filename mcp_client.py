@@ -17,7 +17,7 @@ client = MultiServerMCPClient(
             "transport": "streamable_http",
             # Replace with your new self-hosted URL (Render/Railway/Fly.io), e.g.:
             # "url": "https://your-app-name.onrender.com/mcp"
-            "url": "https://https://serpapi-mcp-server-8u7m.onrender.com/mcp"
+            "url": "https://serpapi-mcp-server-8u7m.onrender.com/mcp"
         }
     }
 )
