@@ -5,7 +5,7 @@ import asyncio
 load_dotenv()
 import streamlit as st
 TAVILY_API_KEY = st.secrets["TAVILY_API_KEY"]
-SERPAPI_KEY = st.secrets["SERPAPI_KEY"]
+SERPAPI_KEY = st.secrets["SERPAPI_API_KEY"]
 
 client = MultiServerMCPClient(
     {
