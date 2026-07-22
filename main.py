@@ -139,12 +139,13 @@ Format exactly like this:
 
 # ✈️ Flights
 note:flights prices should be based on number of people from the query,if not provided assume the paasengers to be 1.
-note:the flight details provided are of a round trip as depature date and return date are provided
+note:the flight details provided are of a round trip as depature date and return date are provided,all the flights proveded by flight agent is of round trip and should 
+shown as one
 - Airline
 - Route
 - Departure
 - Arrival
-- Price
+- Price(round trip)
 
 # 🏨 Hotels
 note:prices should be based on number of people from the query,if not provided assume the paasengers to be 1.
