@@ -58,7 +58,14 @@ async def tavily_mcp_search(query: str):
     await initialize_mcp()
     response = await search_tool.ainvoke(
         {
-            "query": query, "max_results": 5
+            "query": query, "max_results": 10,
+            include_domains = [
+            "booking.com",
+            "agoda.com",
+            "tripadvisor.com",
+            "hotels.com",
+            "expedia.com"
+]
         }
     )
     result = []
