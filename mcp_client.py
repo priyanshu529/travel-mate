@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from langchain_mcp_adapters.client import MultiServerMCPClient
 import os
 import asyncio
+import streamlit as st
 load_dotenv()
 
 TAVILY_API_KEY = st.secrets["TAVILY_API_KEY"]
