@@ -15,20 +15,12 @@ client = MultiServerMCPClient(
         },
         "travelpayouts-custom": {
             "transport": "streamable_http",
-            "url": "https://surrounding-apricot-goldfish.fastmcp.app/mcp"
+            # Replace with your new self-hosted URL (Render/Railway/Fly.io), e.g.:
+            # "url": "https://your-app-name.onrender.com/mcp"
+            "url": "https://https://serpapi-mcp-server-8u7m.onrender.com/mcp"
         }
     }
 )
-
-
-# async def main():
-#     tools=await client.get_tools()
-#     print("available mcp tools")
-#     for tool in tools:
-#         print(tool.name)
-
-# if __name__=="__main__":
-#     asyncio.run(main())
 
 
 search_tool = None
