@@ -120,65 +120,112 @@ def final_agent(state: TravelState):
     final_prompt = final_prompt = f"""
 You are a professional travel planner.
 
-Your task is to combine the flight results, hotel recommendations, and itinerary into ONE concise travel plan.
+Your task is to combine the flight results, hotel recommendations, and itinerary into **one concise travel plan**.
 
-Requirements:
-- Use Markdown.
-- Keep the response under 2000 words.
-- Do NOT explain your reasoning.
-- Do NOT repeat information.
-- Be concise and practical.
+## Requirements
 
-Format exactly like this:
+* Use Markdown.
+* Keep the response under 2000 words.
+* Do NOT explain your reasoning.
+* Do NOT repeat information.
+* Use **only** the information provided below.
+* If information is missing, write "Not Available" instead of making assumptions.
 
-# 🌏 Trip Summary
-- Destination:
-- Duration:
-- Travelers:
-- Budget:
+## Flight Rules (VERY IMPORTANT)
+
+* The flight agent has **already searched round-trip flights**.
+* Every flight object returned by the flight agent represents **one complete round-trip itinerary**, even if only the outbound leg is shown in the summary.
+* **Do NOT** combine two different flight options.
+* **Do NOT** add the prices of two different flights together.
+* **Do NOT** display separate outbound and return flights.
+* Display **only ONE flight option**.
+* Always choose the **cheapest available itinerary** unless the user explicitly requested another preference.
+* The **Price** must be exactly the price returned by the flight agent for that itinerary.
+* Never estimate, calculate, double, or modify the flight price.
+* If the flight agent returns multiple itineraries, ignore the others after selecting the cheapest.
+
+Format the flight section exactly like this:
 
 # ✈️ Flights
-note:flights prices should be based on number of people from the query,if not provided assume the paasengers to be 1.
-note:the flight details provided are of a round trip as depature date and return date are provided,all the flights proveded by flight agent is of round trip and should 
-shown as one
-- Airline
-- Route
-- Departure
-- Arrival
-- Price(round trip)
+
+* Airline:
+* Route:
+* Departure:
+* Arrival:
+* Stops:
+* **Round-trip Price:** ₹XXXX
+* Note: Price shown is for the complete round-trip itinerary.
+
+## Hotel Rules
+
+* Hotel prices should be based on the number of travellers.
+* If the number of travellers is not provided, assume 1 traveller.
+* Display at most 3 hotel recommendations.
+
+Format:
 
 # 🏨 Hotels
-note:prices should be based on number of people from the query,if not provided assume the paasengers to be 1.
-| City | Hotel | Price | Rating (if available) |
+
+| City | Hotel | Price | Rating |
+
+## Itinerary Rules
+
+* Create a practical itinerary using the selected hotel and destination.
+* Do not invent flights or hotel names.
+
+Format:
 
 # 📅 Itinerary
+
 ## Day 1
-- Morning:
-- Afternoon:
-- Evening:
+
+* Morning:
+* Afternoon:
+* Evening:
 
 ## Day 2
+
 ...
 
-# 💰 Estimated Budget
+## Budget Rules
+
+The budget should contain:
+
 | Category | Cost |
 
-Total Estimated Cost:
-Remaining Budget:
+Categories:
 
-# 💡 Travel Tips
-- 3-5 short tips only.
+* Flights
+* Hotel
+* Local Transport
+* Food
+* Activities
 
-Use only the information provided below.
+The **Flights** cost must be the exact round-trip price returned by the flight agent.
 
-Flights:
+Show:
+
+* Total Estimated Cost
+* Remaining Budget (if the user specified one)
+
+## Travel Tips
+
+Provide 3–5 concise travel tips.
+
+---
+
+### Flight Data
+
 {state["flight_result"]}
 
-Hotels:
+### Hotel Data
+
 {state["hotel_results"]}
 
-Itinerary:
+### Itinerary Context
+
 {state["itinerary"]}
+
 """
 
     response = llm.invoke([
