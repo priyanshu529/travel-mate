@@ -2,9 +2,9 @@ import os
 import requests
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
-
+import streamlit as st
 load_dotenv()
-SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY")
+SERPAPI_API_KEY = st.secrets["SERPAPI_API_KEY"]
 
 mcp = FastMCP("travelpayouts-custom")  # tool names kept as-is so mcp_client.py doesn't need to change its lookups
 
