@@ -25,7 +25,7 @@ TAVILY_API_KEY = st.secrets["TAVILY_API_KEY"]
 
 
 llm=ChatGroq(
-    model="openai/gpt-oss-20b"
+    model="openai/gpt-oss-120b"
 )
 
 class TravelState(TypedDict):
