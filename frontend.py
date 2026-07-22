@@ -1,4 +1,5 @@
 import os
+import uuid
 import streamlit as st
 from datetime import datetime
 from langchain_core.messages import HumanMessage
@@ -210,8 +211,13 @@ div[data-testid="stDownloadButton"] > button {
 </style>
 """, unsafe_allow_html=True)
 
-# ── Session ID ────────────────────────────────────────────────────────────────
-thread_id = "aarohi_user"
+# ── Session ID (unique per browser session — no shared memory across users) ──
+# Each session gets its own UUID the first time it loads. This is used purely
+# as an isolation key for the LangGraph run; no conversation history/memory
+# is persisted or reused across runs or across users.
+if "thread_id" not in st.session_state:
+    st.session_state.thread_id = str(uuid.uuid4())
+thread_id = st.session_state.thread_id
 
 # ── Hero ──────────────────────────────────────────────────────────────────────
 st.markdown("""
@@ -275,11 +281,12 @@ if generate:
     if not user_query.strip():
         st.warning("Please describe your trip first.")
     else:
+        # Fresh, isolated run config for this session's UUID.
+        # No memory / history is loaded or carried over between runs.
         config = {"configurable": {"thread_id": thread_id}}
 
-        # ── FIXED: consistent key name "flight_result" throughout ──
         collected = {
-            "flight_result": "",   # ← was "flight_results" (plural) before — now fixed
+            "flight_result": "",
             "hotel_results": "",
             "itinerary": "",
             "final_response": "",
@@ -346,7 +353,7 @@ if generate:
         file_content = f"""# Travel Plan
 **Query:** {user_query}
 **Generated:** {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-**User ID:** {thread_id}
+**Session ID:** {thread_id}
 
 ---
 
