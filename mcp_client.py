@@ -68,18 +68,39 @@ async def tavily_mcp_search(query: str):
 ]
         }
     )
-    result = []
-    for i, r in enumerate(response, start=1):
-        title = r.get("title", "unknown")
-        url = r.get("url", "")
-        snippet = r.get("content", "")
+    if not response:
+        return "No hotel results found."
+
+    try:
+        data = json.loads(response[0]["text"])
+    except Exception as e:
+        return f"Unable to parse Tavily response: {e}"
+
+    results = data.get("results", [])
+
+    if not results:
+        return "No hotel results found."
+
+    formatted = []
+
+    for i, hotel in enumerate(results, start=1):
+        title = hotel.get("title", "Unknown Hotel")
+        url = hotel.get("url", "")
+        snippet = hotel.get("content", "")
 
         if len(snippet) > 300:
-            snippet = snippet[:300].rsplit(" ", 1)[0] + "...."
+            snippet = snippet[:300].rsplit(" ", 1)[0] + "..."
 
-        result.append(f"{i}. **{title}** \n {url} \n  {snippet}")
+        formatted.append(
+            f"""### {i}. {title}
 
-    return "\n\n".join(result)
+URL: {url}
+
+{snippet}
+"""
+        )
+
+    return "\n\n".join(formatted)
 
 
 async def flight_mcp_search(destination, depart_date, ret_date=None, origin="DEL", passengers=1, currency="INR"):
